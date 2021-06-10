@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.onesignal.OneSignal;
 
 import java.io.UnsupportedEncodingException;
 
@@ -46,9 +47,14 @@ public class MainActivity extends AppCompatActivity {
         myFilter.addAction(networkStatus);
         Intent intent = new Intent(this, ConnectionService.class);
         startService(intent);
-        if (isOnline(getApplicationContext()))
+        if (isConnected(getApplicationContext()))
             startApp();
         else showConnectionMessage();
+
+        // initialiseOneSignal
+            OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+            OneSignal.initWithContext(this);
+            OneSignal.setAppId("c08e7b14-53d4-4834-98a7-5643c296d392");
 
     }
 
@@ -56,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         fullScreen();
         registerReceiver(broadcastReceiver, myFilter);
-        if (isOnline(getApplicationContext()))
+        if (isConnected(getApplicationContext()))
             startApp();
         else showConnectionMessage();
         super.onResume();
@@ -90,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }, delay);
     }
 
-    public boolean isOnline(Context context) {
+    public boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info != null && info.isConnectedOrConnecting()) return true;
