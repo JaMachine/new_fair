@@ -27,13 +27,13 @@ import android.webkit.WebViewClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import pl.droidsonroids.gif.GifImageView;
 
 import static com.le.fair.org.app.ConnectionService.networkStatus;
-import static com.le.fair.org.app.MainActivity.dc;
 import static com.le.fair.org.app.MainActivity.mySource;
 
 public class WebViewActivity extends AppCompatActivity {
@@ -48,6 +48,23 @@ public class WebViewActivity extends AppCompatActivity {
     protected static int requestCode = 1;
     protected static int resultCode = 1;
 
+
+    public class myClient extends WebViewClient {
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            try {
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("cGludGVyZXN0"))) return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("dHdpdHRlcg=="))) return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("ZmFjZWJvb2s="))) return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("aW5zdGFncmFt"))) return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("eW91dHViZQ=="))) return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("bGlua2Vk"))) return true;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +78,7 @@ public class WebViewActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
-        myView.setWebViewClient(new customWebViewClient());
+        myView.setWebViewClient(new myClient());
         myView.getSettings().setJavaScriptEnabled(true);
         myView.getSettings().setAllowFileAccess(true);
         myView.getSettings().setDomStorageEnabled(true);
@@ -190,19 +207,6 @@ public class WebViewActivity extends AppCompatActivity {
         myInternetStatus.setVisibility(View.VISIBLE);
         myView.setVisibility(View.GONE);
     }
-
-    public class customWebViewClient extends WebViewClient {
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (Uri.parse(url).getHost().contains(dc("cGludGVyZXN0"))) return true;
-            if (Uri.parse(url).getHost().contains(dc("dHdpdHRlcg=="))) return true;
-            if (Uri.parse(url).getHost().contains(dc("ZmFjZWJvb2s="))) return true;
-            if (Uri.parse(url).getHost().contains(dc("aW5zdGFncmFt"))) return true;
-            if (Uri.parse(url).getHost().contains(dc("eW91dHViZQ=="))) return true;
-            if (Uri.parse(url).getHost().contains(dc("bGlua2Vk"))) return true;
-            return false;
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

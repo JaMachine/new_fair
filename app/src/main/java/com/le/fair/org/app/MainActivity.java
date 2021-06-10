@@ -104,15 +104,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public static String dc(String str) {
-        String text = "";
-        byte[] data = Base64.decode(str, Base64.DEFAULT);
-        try {
-            text = new String(data, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return text;
+    public static String getString(String string) throws UnsupportedEncodingException {
+        byte[] data = Base64.decode(string, Base64.DEFAULT);
+        return new String(data, "UTF-8");
     }
 
 
@@ -145,7 +139,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Boolean> task) {
                     if (myFirebaseRemoteConfig.getString("salo").contains("salo")) {
-                        mySource = dc(mySource);
+                        try {
+                            mySource = getString(mySource);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         mySource = myFirebaseRemoteConfig.getString("salo");
                     }
