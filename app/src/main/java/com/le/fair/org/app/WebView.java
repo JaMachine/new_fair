@@ -183,8 +183,8 @@ public class WebView extends AppCompatActivity {
         Intent intent = new Intent(this, NetworkListener.class);
         startService(intent);
         if (isConnected(getApplicationContext()))
-            showWebView();
-        else hideWebView();
+            connectedView();
+        else disconnectedMsg();
     }
 
     public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -192,25 +192,25 @@ public class WebView extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(networkStatus)) {
                 if (intent.getStringExtra("online_status").equals("true"))
-                    showWebView();
-                else hideWebView();
+                    connectedView();
+                else disconnectedMsg();
             }
         }
     };
 
-    public void showWebView() {
+    void disconnectedMsg() {
+        myInternetStatus.setVisibility(View.VISIBLE);
+        myView.setVisibility(View.GONE);
+        myOnline = false;
+    }
+
+    public void connectedView() {
         if (!myOnline) {
             myInternetStatus.setVisibility(View.GONE);
             myView.loadUrl(mySource);
             myView.setVisibility(View.VISIBLE);
             myOnline = true;
         }
-    }
-
-    public void hideWebView() {
-        myOnline = false;
-        myInternetStatus.setVisibility(View.VISIBLE);
-        myView.setVisibility(View.GONE);
     }
 
     @Override
@@ -273,13 +273,6 @@ public class WebView extends AppCompatActivity {
         super.onResume();
     }
 
-    private void fullScreen() {
-        View v = findViewById(R.id.wv_container);
-        v.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_FULLSCREEN);
-    }
-
     @Override
     protected void onRestart() {
         registerReceiver(broadcastReceiver, myFilter);
@@ -299,5 +292,12 @@ public class WebView extends AppCompatActivity {
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info != null && info.isConnectedOrConnecting()) return true;
         else return false;
+    }
+
+    private void fullScreen() {
+        View v = findViewById(R.id.wv_container);
+        v.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 }

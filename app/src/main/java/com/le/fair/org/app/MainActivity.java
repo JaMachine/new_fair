@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
         if (isConnected(getApplicationContext()))
             prepareFirebase();
-        else showConnectionMessage();
+        else disconnectedMsg();
 
         // initialiseOneSignal
             OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(myReceiver, myFilter);
         if (isConnected(getApplicationContext()))
             prepareFirebase();
-        else showConnectionMessage();
+        else disconnectedMsg();
         super.onResume();
     }
 
@@ -144,12 +144,12 @@ public class MainActivity extends AppCompatActivity {
             if (intent.getAction().equals(networkStatus)) {
                 if (intent.getStringExtra("online_status").equals("true"))
                     prepareFirebase();
-                else showConnectionMessage();
+                else disconnectedMsg();
             }
         }
     };
 
-    void showConnectionMessage() {
+    void disconnectedMsg() {
         myInternetStatus.setVisibility(View.VISIBLE);
         myOnline = false;
     }
