@@ -33,10 +33,10 @@ public class NetworkListener extends Service {
         public void run() {
             handler.postDelayed(statusListener, 333);
             Intent intent = new Intent();
-            intent.setAction(networkStatus);
+            intent.setAction(myNetworkStatus);
             intent.putExtra("online_status", "" + isConnected(NetworkListener.this));
             sendBroadcast(intent);
         }
     };
-    public static String networkStatus = "status";
+    public static String myNetworkStatus = "status";
 }

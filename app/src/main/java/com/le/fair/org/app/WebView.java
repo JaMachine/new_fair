@@ -32,10 +32,12 @@ import java.util.Date;
 
 import pl.droidsonroids.gif.GifImageView;
 
-import static com.le.fair.org.app.NetworkListener.networkStatus;
+import static com.le.fair.org.app.NetworkListener.myNetworkStatus;
 import static com.le.fair.org.app.MainActivity.mySource;
 
 public class WebView extends AppCompatActivity {
+    protected static int requestCode = 1;
+    protected static int resultCode = 1;
     protected android.webkit.WebView myView;
     protected boolean myOnline;
     protected ValueCallback<Uri> myUploadMsg;
@@ -44,8 +46,6 @@ public class WebView extends AppCompatActivity {
     protected ValueCallback<Uri[]> myFilesFolder;
     protected String myPhotosFolder;
     protected IntentFilter myFilter;
-    protected static int requestCode = 1;
-    protected static int resultCode = 1;
 
 
     public class myClient extends WebViewClient {
@@ -74,11 +74,6 @@ public class WebView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
-        fullScreen();
-
-        myInternetStatus = findViewById(R.id.wv_internet_status);
-
-
         myView = findViewById(R.id.wv);
         if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(WebView.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
@@ -179,18 +174,21 @@ public class WebView extends AppCompatActivity {
 
         });
         myFilter = new IntentFilter();
-        myFilter.addAction(networkStatus);
+        myFilter.addAction(myNetworkStatus);
         Intent intent = new Intent(this, NetworkListener.class);
         startService(intent);
+        myInternetStatus = findViewById(R.id.wv_internet_status);
         if (isConnected(getApplicationContext()))
             connectedView();
         else disconnectedMsg();
+
+        fullScreen();
     }
 
     public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(networkStatus)) {
+            if (intent.getAction().equals(myNetworkStatus)) {
                 if (intent.getStringExtra("online_status").equals("true"))
                     connectedView();
                 else disconnectedMsg();

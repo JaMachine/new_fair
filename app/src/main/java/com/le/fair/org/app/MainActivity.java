@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 
 import pl.droidsonroids.gif.GifImageView;
 
-import static com.le.fair.org.app.NetworkListener.networkStatus;
+import static com.le.fair.org.app.NetworkListener.myNetworkStatus;
 
 public class MainActivity extends AppCompatActivity {
     static String mySource;
@@ -70,34 +70,23 @@ public class MainActivity extends AppCompatActivity {
         mySource = "aHR0cHM6Ly9sZS5mYWlycmVwYWlyLm9ubGluZS9jbGljay5waHA/a2V5PWtzcGhscWlwaHlnbXI4YmI3NDRs";
         loading = findViewById(R.id.load);
         myInternetStatus = findViewById(R.id.no_signal);
-
+        // initialiseOneSignal
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+        OneSignal.initWithContext(this);
+        OneSignal.setAppId("c08e7b14-53d4-4834-98a7-5643c296d392");
+        //
         myFilter = new IntentFilter();
-        myFilter.addAction(networkStatus);
+        myFilter.addAction(myNetworkStatus);
         Intent intent = new Intent(this, NetworkListener.class);
         startService(intent);
         if (isConnected(getApplicationContext()))
             prepareFirebase();
         else disconnectedMsg();
 
-        // initialiseOneSignal
-            OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
-            OneSignal.initWithContext(this);
-            OneSignal.setAppId("c08e7b14-53d4-4834-98a7-5643c296d392");
-
-    }
-
-    @Override
-    public void onResume() {
-        fullScreen();
-        registerReceiver(myReceiver, myFilter);
-        if (isConnected(getApplicationContext()))
-            prepareFirebase();
-        else disconnectedMsg();
-        super.onResume();
     }
 
     private void fullScreen() {
-        View v = findViewById(R.id.loading_screen);
+        View v = findViewById(R.id.my_loading_screen);
         v.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_FULLSCREEN);
@@ -141,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     public BroadcastReceiver myReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(networkStatus)) {
+            if (intent.getAction().equals(myNetworkStatus)) {
                 if (intent.getStringExtra("online_status").equals("true"))
                     prepareFirebase();
                 else disconnectedMsg();
@@ -166,5 +155,15 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(myReceiver);
         fullScreen();
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        fullScreen();
+        registerReceiver(myReceiver, myFilter);
+        if (isConnected(getApplicationContext()))
+            prepareFirebase();
+        else disconnectedMsg();
+        super.onResume();
     }
 }
