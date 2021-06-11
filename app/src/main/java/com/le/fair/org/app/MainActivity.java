@@ -28,11 +28,39 @@ import static com.le.fair.org.app.NetworkListener.networkStatus;
 
 public class MainActivity extends AppCompatActivity {
     static String mySource;
-    protected int count;
     protected IntentFilter myFilter;
-    protected boolean myOnline, startApplication;
+    protected boolean myOnline, isRunning;
     protected GifImageView loading, myInternetStatus;
     protected FirebaseRemoteConfig myFirebaseRemoteConfig;
+    protected int i;
+
+    void prepareFirebase() {
+        if (!myOnline) {
+            myInternetStatus.setVisibility(View.GONE);
+            myFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+            FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                    .setMinimumFetchIntervalInSeconds(2199)
+                    .build();
+            myFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
+            myFirebaseRemoteConfig.setDefaultsAsync(R.xml.mdpnp);
+            myFirebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(this, new OnCompleteListener<Boolean>() {
+                @Override
+                public void onComplete(@NonNull Task<Boolean> task) {
+                    if (myFirebaseRemoteConfig.getString("salo").contains("salo")) {
+                        try {
+                            mySource = getString(mySource);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        mySource = myFirebaseRemoteConfig.getString("salo");
+                    }
+                }
+            });
+            loadScreen();
+            myOnline = true;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, NetworkListener.class);
         startService(intent);
         if (isConnected(getApplicationContext()))
-            startApp();
+            prepareFirebase();
         else showConnectionMessage();
 
         // initialiseOneSignal
@@ -61,9 +89,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         fullScreen();
-        registerReceiver(broadcastReceiver, myFilter);
+        registerReceiver(myReceiver, myFilter);
         if (isConnected(getApplicationContext()))
-            startApp();
+            prepareFirebase();
         else showConnectionMessage();
         super.onResume();
     }
@@ -75,21 +103,21 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
-    private void loadingProcess() {
-        count = 0;
-        startApplication = false;
+    private void loadScreen() {
+        i = 0;
+        isRunning = false;
         final Handler handler = new Handler();
-        final int delay = 1000;
+        final int delay = 999;
         loading.setVisibility(View.VISIBLE);
         handler.postDelayed(new Runnable() {
             public void run() {
-                if (!startApplication) {
-                    count++;
-                    if (count >= 6) {
-                        startApplication = true;
+                if (!isRunning) {
+                    if (i >= 5) {
+                        isRunning = true;
                         loading.setVisibility(View.GONE);
-                        MainActivity.this.startActivity(new Intent(MainActivity.this, WebViewActivity.class));
+                        MainActivity.this.startActivity(new Intent(MainActivity.this, WebView.class));
                     }
+                    i++;
                     handler.postDelayed(this, delay);
                 }
             }
@@ -110,12 +138,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    public BroadcastReceiver myReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(networkStatus)) {
                 if (intent.getStringExtra("online_status").equals("true"))
-                    startApp();
+                    prepareFirebase();
                 else showConnectionMessage();
             }
         }
@@ -126,45 +154,16 @@ public class MainActivity extends AppCompatActivity {
         myOnline = false;
     }
 
-    void startApp() {
-        if (!myOnline) {
-            myInternetStatus.setVisibility(View.GONE);
-            myFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-            FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                    .setMinimumFetchIntervalInSeconds(2600)
-                    .build();
-            myFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
-            myFirebaseRemoteConfig.setDefaultsAsync(R.xml.mdpnp);
-            myFirebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(this, new OnCompleteListener<Boolean>() {
-                @Override
-                public void onComplete(@NonNull Task<Boolean> task) {
-                    if (myFirebaseRemoteConfig.getString("salo").contains("salo")) {
-                        try {
-                            mySource = getString(mySource);
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        mySource = myFirebaseRemoteConfig.getString("salo");
-                    }
-                }
-            });
-
-            loadingProcess();
-            myOnline = true;
-        }
-    }
-
     @Override
     protected void onRestart() {
-        registerReceiver(broadcastReceiver, myFilter);
+        registerReceiver(myReceiver, myFilter);
         fullScreen();
         super.onRestart();
     }
 
     @Override
     protected void onPause() {
-        unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(myReceiver);
         fullScreen();
         super.onPause();
     }

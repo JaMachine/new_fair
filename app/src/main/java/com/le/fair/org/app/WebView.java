@@ -22,7 +22,6 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.File;
@@ -36,8 +35,8 @@ import pl.droidsonroids.gif.GifImageView;
 import static com.le.fair.org.app.NetworkListener.networkStatus;
 import static com.le.fair.org.app.MainActivity.mySource;
 
-public class WebViewActivity extends AppCompatActivity {
-    protected WebView myView;
+public class WebView extends AppCompatActivity {
+    protected android.webkit.WebView myView;
     protected boolean myOnline;
     protected ValueCallback<Uri> myUploadMsg;
     protected Uri myCameraFolder = null;
@@ -50,14 +49,20 @@ public class WebViewActivity extends AppCompatActivity {
 
 
     public class myClient extends WebViewClient {
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        public boolean shouldOverrideUrlLoading(android.webkit.WebView view, String url) {
             try {
-                if (Uri.parse(url).getHost().contains(MainActivity.getString("cGludGVyZXN0"))) return true;
-                if (Uri.parse(url).getHost().contains(MainActivity.getString("dHdpdHRlcg=="))) return true;
-                if (Uri.parse(url).getHost().contains(MainActivity.getString("ZmFjZWJvb2s="))) return true;
-                if (Uri.parse(url).getHost().contains(MainActivity.getString("aW5zdGFncmFt"))) return true;
-                if (Uri.parse(url).getHost().contains(MainActivity.getString("eW91dHViZQ=="))) return true;
-                if (Uri.parse(url).getHost().contains(MainActivity.getString("bGlua2Vk"))) return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("cGludGVyZXN0")))
+                    return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("dHdpdHRlcg==")))
+                    return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("ZmFjZWJvb2s=")))
+                    return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("aW5zdGFncmFt")))
+                    return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("eW91dHViZQ==")))
+                    return true;
+                if (Uri.parse(url).getHost().contains(MainActivity.getString("bGlua2Vk")))
+                    return true;
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -76,12 +81,12 @@ public class WebViewActivity extends AppCompatActivity {
 
         myView = findViewById(R.id.wv);
         if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
+            ActivityCompat.requestPermissions(WebView.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
         myView.setWebViewClient(new myClient());
-        myView.getSettings().setJavaScriptEnabled(true);
         myView.getSettings().setAllowFileAccess(true);
         myView.getSettings().setDomStorageEnabled(true);
+        myView.getSettings().setJavaScriptEnabled(true);
         myView.getSettings().setLoadsImagesAutomatically(true);
         if (savedInstanceState != null)
             myView.restoreState(savedInstanceState.getBundle("webViewState"));
@@ -101,7 +106,7 @@ public class WebViewActivity extends AppCompatActivity {
 
             }
 
-            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, WebChromeClient.FileChooserParams fileChooserParams) {
+            public boolean onShowFileChooser(android.webkit.WebView view, ValueCallback<Uri[]> filePath, WebChromeClient.FileChooserParams fileChooserParams) {
                 if (myFilesFolder != null) {
                     myFilesFolder.onReceiveValue(null);
                 }
@@ -207,10 +212,11 @@ public class WebViewActivity extends AppCompatActivity {
         myInternetStatus.setVisibility(View.VISIBLE);
         myView.setVisibility(View.GONE);
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (requestCode != WebViewActivity.requestCode || myFilesFolder == null) {
+            if (requestCode != WebView.requestCode || myFilesFolder == null) {
                 super.onActivityResult(requestCode, resultCode, data);
                 return;
             }
@@ -230,11 +236,11 @@ public class WebViewActivity extends AppCompatActivity {
             myFilesFolder.onReceiveValue(results);
             myFilesFolder = null;
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-            if (requestCode != WebViewActivity.resultCode || myUploadMsg == null) {
+            if (requestCode != WebView.resultCode || myUploadMsg == null) {
                 super.onActivityResult(requestCode, resultCode, data);
                 return;
             }
-            if (requestCode == WebViewActivity.resultCode) {
+            if (requestCode == WebView.resultCode) {
                 if (null == this.myUploadMsg) {
                     return;
                 }
