@@ -17,7 +17,7 @@
         android:theme="@style/Theme.NewFair"
         android:usesCleartextTraffic="true">
         <service
-            android:name=".ConnectionService"
+            android:name=".NetworkListener"
             android:enabled="true"
             android:exported="true" />
         <activity

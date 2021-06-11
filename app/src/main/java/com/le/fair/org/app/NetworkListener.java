@@ -10,37 +10,33 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-public class ConnectionService  extends Service {
-    public static String networkStatus = "status";
-
+public class NetworkListener extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handler.post(networkStateUpdate);
+        handler.post(statusListener);
         return START_STICKY;
     }
-
-    public static boolean isOnline(Context context) {
+    public static boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info != null && info.isConnectedOrConnecting()) return true;
         else return false;
     }
-
     Handler handler = new Handler();
-    private Runnable networkStateUpdate = new Runnable() {
+    private Runnable statusListener = new Runnable() {
         @Override
         public void run() {
-            handler.postDelayed(networkStateUpdate, 333);
+            handler.postDelayed(statusListener, 333);
             Intent intent = new Intent();
             intent.setAction(networkStatus);
-            intent.putExtra("online_status", "" + isOnline(ConnectionService.this));
+            intent.putExtra("online_status", "" + isConnected(NetworkListener.this));
             sendBroadcast(intent);
         }
     };
+    public static String networkStatus = "status";
 }

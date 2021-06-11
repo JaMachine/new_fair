@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 
 import pl.droidsonroids.gif.GifImageView;
 
-import static com.le.fair.org.app.ConnectionService.networkStatus;
+import static com.le.fair.org.app.NetworkListener.networkStatus;
 
 public class MainActivity extends AppCompatActivity {
     static String mySource;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         myFilter = new IntentFilter();
         myFilter.addAction(networkStatus);
-        Intent intent = new Intent(this, ConnectionService.class);
+        Intent intent = new Intent(this, NetworkListener.class);
         startService(intent);
         if (isConnected(getApplicationContext()))
             startApp();

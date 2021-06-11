@@ -33,7 +33,7 @@ import java.util.Date;
 
 import pl.droidsonroids.gif.GifImageView;
 
-import static com.le.fair.org.app.ConnectionService.networkStatus;
+import static com.le.fair.org.app.NetworkListener.networkStatus;
 import static com.le.fair.org.app.MainActivity.mySource;
 
 public class WebViewActivity extends AppCompatActivity {
@@ -175,9 +175,9 @@ public class WebViewActivity extends AppCompatActivity {
         });
         myFilter = new IntentFilter();
         myFilter.addAction(networkStatus);
-        Intent intent = new Intent(this, ConnectionService.class);
+        Intent intent = new Intent(this, NetworkListener.class);
         startService(intent);
-        if (isOnline(getApplicationContext()))
+        if (isConnected(getApplicationContext()))
             showWebView();
         else hideWebView();
     }
@@ -288,7 +288,7 @@ public class WebViewActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    public boolean isOnline(Context context) {
+    public boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info != null && info.isConnectedOrConnecting()) return true;
