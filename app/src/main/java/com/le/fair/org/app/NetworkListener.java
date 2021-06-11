@@ -24,8 +24,10 @@ public class NetworkListener extends Service {
     public static boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.isConnectedOrConnecting()) return true;
-        else return false;
+        if (info != null && info.isConnectedOrConnecting())
+            return true;
+        else
+            return false;
     }
     Handler handler = new Handler();
     private Runnable statusListener = new Runnable() {

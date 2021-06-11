@@ -40,9 +40,9 @@ public class WebView extends AppCompatActivity {
     protected static int resultCode = 1;
     protected android.webkit.WebView myView;
     protected boolean myOnline;
-    protected ValueCallback<Uri> myUploadMsg;
     protected Uri myCameraFolder = null;
     protected GifImageView myInternetStatus;
+    protected ValueCallback<Uri> myUploadMsg;
     protected ValueCallback<Uri[]> myFilesFolder;
     protected String myPhotosFolder;
     protected IntentFilter myFilter;
@@ -288,8 +288,10 @@ public class WebView extends AppCompatActivity {
     public boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.isConnectedOrConnecting()) return true;
-        else return false;
+        if (info != null && info.isConnectedOrConnecting())
+            return true;
+        else
+            return false;
     }
 
     private void fullScreen() {

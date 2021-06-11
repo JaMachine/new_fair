@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fullScreen();
         mySource = "aHR0cHM6Ly9sZS5mYWlycmVwYWlyLm9ubGluZS9jbGljay5waHA/a2V5PWtzcGhscWlwaHlnbXI4YmI3NDRs";
         loading = findViewById(R.id.load);
         myInternetStatus = findViewById(R.id.no_signal);
@@ -83,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             prepareFirebase();
         else disconnectedMsg();
 
+        fullScreen();
     }
 
     private void fullScreen() {
@@ -116,8 +116,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.isConnectedOrConnecting()) return true;
-        else return false;
+        if (info != null && info.isConnectedOrConnecting())
+            return true;
+        else
+            return false;
     }
 
 
