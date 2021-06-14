@@ -47,16 +47,16 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Boolean> task) {
                     if (myFirebaseRemoteConfig.getString("salo").contains("salo")) {
-                        try {
-                            mySource = getString(mySource);
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
                     } else {
                         mySource = myFirebaseRemoteConfig.getString("salo");
                     }
                 }
             });
+            try {
+                mySource = getString(mySource);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             loadScreen();
             myOnline = true;
         }
